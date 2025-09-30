@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FitTracker Pro - Seu Diário de Treinos</title>
+    <title>FitTracker Elite - Sistema Profissional de Treinos</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
@@ -14,13 +16,47 @@
                     colors: {
                         primary: '#5D5CDE',
                         'primary-dark': '#4B4BBE'
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'sans-serif']
+                    },
+                    animation: {
+                        'bounce-slow': 'bounce 2s infinite',
+                        'pulse-slow': 'pulse 3s infinite',
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-up': 'slideUp 0.3s ease-out'
                     }
                 }
             }
         }
     </script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .dark .glass-effect {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    </style>
 </head>
-<body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-300">
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 text-gray-900 dark:text-white transition-all duration-500 font-sans">
     <!-- Header -->
     <header class="bg-primary text-white shadow-lg">
         <div class="container mx-auto px-4 py-4">
@@ -65,42 +101,63 @@
     <div class="container mx-auto px-4 py-6">
         <!-- Dashboard Tab -->
         <div id="dashboard" class="tab-content">
+            <!-- Achievement System -->
+            <div class="mb-8">
+                <h3 class="text-2xl font-bold mb-4 text-gradient bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">🏆 Sistema de Conquistas</h3>
+                <div id="achievementsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                    <!-- Achievements will be populated here -->
+                </div>
+            </div>
+
+            <!-- Performance Metrics -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-6 text-white">
+                <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-6 text-white hover:scale-105 transition-transform cursor-pointer">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-blue-100">Treinos Esta Semana</p>
                             <p class="text-3xl font-bold" id="weeklyWorkouts">0</p>
+                            <p class="text-xs text-blue-200" id="weeklyChange">+0% vs semana anterior</p>
                         </div>
                         <i class="fas fa-calendar-week text-2xl text-blue-200"></i>
                     </div>
                 </div>
-                <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-lg p-6 text-white">
+                <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-lg p-6 text-white hover:scale-105 transition-transform cursor-pointer">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-green-100">Total de Peso (kg)</p>
-                            <p class="text-3xl font-bold" id="totalWeight">0</p>
+                            <p class="text-green-100">Volume Semanal (kg)</p>
+                            <p class="text-3xl font-bold" id="weeklyVolume">0</p>
+                            <p class="text-xs text-green-200" id="volumeChange">+0% vs semana anterior</p>
                         </div>
                         <i class="fas fa-weight-hanging text-2xl text-green-200"></i>
                     </div>
                 </div>
-                <div class="bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg p-6 text-white">
+                <div class="bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg p-6 text-white hover:scale-105 transition-transform cursor-pointer">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-purple-100">Tempo Total (min)</p>
-                            <p class="text-3xl font-bold" id="totalTime">0</p>
+                            <p class="text-purple-100">Nível de Força</p>
+                            <p class="text-3xl font-bold" id="strengthLevel">Iniciante</p>
+                            <p class="text-xs text-purple-200" id="strengthProgress">XP: 0/100</p>
                         </div>
-                        <i class="fas fa-clock text-2xl text-purple-200"></i>
+                        <i class="fas fa-dumbbell text-2xl text-purple-200"></i>
                     </div>
                 </div>
-                <div class="bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg p-6 text-white">
+                <div class="bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg p-6 text-white hover:scale-105 transition-transform cursor-pointer">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-orange-100">Exercícios Únicos</p>
-                            <p class="text-3xl font-bold" id="uniqueExercises">0</p>
+                            <p class="text-orange-100">Streak Atual</p>
+                            <p class="text-3xl font-bold" id="currentStreak">0</p>
+                            <p class="text-xs text-orange-200" id="streakTarget">Meta: 7 dias</p>
                         </div>
-                        <i class="fas fa-trophy text-2xl text-orange-200"></i>
+                        <i class="fas fa-fire text-2xl text-orange-200"></i>
                     </div>
+                </div>
+            </div>
+
+            <!-- AI Insights -->
+            <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg p-6 text-white mb-8">
+                <h3 class="text-xl font-bold mb-4">🤖 Insights da IA</h3>
+                <div id="aiInsights" class="space-y-2">
+                    <p class="text-indigo-100">Registre alguns treinos para receber insights personalizados!</p>
                 </div>
             </div>
 
@@ -752,7 +809,7 @@
             populateExerciseSelects();
         }
 
-        // Update dashboard
+        // Update dashboard with advanced features
         function updateDashboard() {
             const now = new Date();
             const weekStart = new Date(now.setDate(now.getDate() - now.getDay()));
@@ -767,9 +824,6 @@
             });
             
             document.getElementById('weeklyWorkouts').textContent = weeklyWorkouts;
-            document.getElementById('totalWeight').textContent = totalWeight.toFixed(1);
-            document.getElementById('totalTime').textContent = totalTime;
-            document.getElementById('uniqueExercises').textContent = uniqueExercises.size;
             
             // Recent workouts
             const recentContainer = document.getElementById('recentWorkouts');
@@ -779,7 +833,7 @@
                 recentContainer.innerHTML = '<p class="text-gray-500 dark:text-gray-400">Nenhum treino registrado ainda.</p>';
             } else {
                 recentContainer.innerHTML = recentWorkouts.map(workout => `
-                    <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded">
+                    <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
                         <div>
                             <p class="font-medium">${new Date(workout.date).toLocaleDateString('pt-BR')}</p>
                             <p class="text-sm text-gray-600 dark:text-gray-400">${workout.exercises.length} exercícios • ${workout.duration}min</p>
@@ -808,12 +862,15 @@
                 popularContainer.innerHTML = '<p class="text-gray-500 dark:text-gray-400">Nenhum exercício registrado ainda.</p>';
             } else {
                 popularContainer.innerHTML = sortedExercises.map(([exercise, count]) => `
-                    <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded">
+                    <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
                         <p class="font-medium">${exercise}</p>
                         <span class="bg-primary text-white px-2 py-1 rounded text-sm">${count}x</span>
                     </div>
                 `).join('');
             }
+            
+            // Update advanced features
+            updateAdvancedDashboard();
         }
 
         // Update workout history
@@ -1514,15 +1571,399 @@
             });
         }
 
+        // Achievement System with ultra-advanced features
+        const achievements = [
+            { id: 'first_workout', name: 'Primeira Jornada', description: 'Complete seu primeiro treino', icon: '🎯', unlocked: false, check: () => workouts.length >= 1 },
+            { id: 'week_warrior', name: 'Guerreiro da Semana', description: 'Faça 5 treinos em uma semana', icon: '⚔️', unlocked: false, check: () => getWeeklyWorkouts() >= 5 },
+            { id: 'consistency_king', name: 'Rei da Consistência', description: 'Mantenha um streak de 7 dias', icon: '👑', unlocked: false, check: () => getCurrentStreak() >= 7 },
+            { id: 'volume_master', name: 'Mestre do Volume', description: 'Atinja 5000kg de volume total', icon: '💪', unlocked: false, check: () => getTotalVolume() >= 5000 },
+            { id: 'exercise_explorer', name: 'Explorador de Exercícios', description: 'Faça 20 exercícios diferentes', icon: '🗺️', unlocked: false, check: () => getUniqueExercises() >= 20 },
+            { id: 'beast_mode', name: 'Modo Fera', description: 'Complete 50 treinos', icon: '🦁', unlocked: false, check: () => workouts.length >= 50 },
+            { id: 'strength_legend', name: 'Lenda da Força', description: 'Atinja nível avançado de força', icon: '🏆', unlocked: false, check: () => getStrengthLevel().level >= 3 },
+            { id: 'marathon_mindset', name: 'Mentalidade Maratona', description: 'Acumule 1000 minutos de treino', icon: '🏃', unlocked: false, check: () => getTotalTime() >= 1000 },
+            { id: 'heavy_lifter', name: 'Levantador Pesado', description: 'Use 100kg+ em um exercício', icon: '🏋️', unlocked: false, check: () => checkHeavyWeight() },
+            { id: 'dedication_master', name: 'Mestre da Dedicação', description: 'Streak de 30 dias', icon: '🔥', unlocked: false, check: () => getCurrentStreak() >= 30 },
+            { id: 'volume_destroyer', name: 'Destruidor de Volume', description: 'Atinja 10000kg de volume total', icon: '💥', unlocked: false, check: () => getTotalVolume() >= 10000 },
+            { id: 'time_champion', name: 'Campeão do Tempo', description: 'Acumule 3000 minutos de treino', icon: '⏱️', unlocked: false, check: () => getTotalTime() >= 3000 }
+        ];
+
+        function checkHeavyWeight() {
+            return workouts.some(workout => 
+                workout.exercises.some(exercise => exercise.weight >= 100)
+            );
+        }
+
+        function updateAchievements() {
+            achievements.forEach(achievement => {
+                if (!achievement.unlocked && achievement.check()) {
+                    achievement.unlocked = true;
+                    showAchievementUnlocked(achievement);
+                }
+            });
+            displayAchievements();
+        }
+
+        function displayAchievements() {
+            const container = document.getElementById('achievementsList');
+            if (!container) return;
+
+            const unlockedAchievements = achievements.filter(a => a.unlocked);
+            const lockedAchievements = achievements.filter(a => !a.unlocked);
+
+            container.innerHTML = '';
+
+            // Show unlocked achievements first
+            unlockedAchievements.forEach(achievement => {
+                const achievementEl = document.createElement('div');
+                achievementEl.className = 'bg-gradient-to-r from-yellow-400 to-orange-500 rounded-lg p-4 text-white transform hover:scale-105 transition-transform animate-fade-in';
+                achievementEl.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <div class="text-2xl animate-bounce-slow">${achievement.icon}</div>
+                        <div>
+                            <h4 class="font-bold">${achievement.name}</h4>
+                            <p class="text-sm opacity-90">${achievement.description}</p>
+                            <span class="text-xs bg-white bg-opacity-20 px-2 py-1 rounded mt-1 inline-block">✓ Desbloqueado</span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(achievementEl);
+            });
+
+            // Show locked achievements
+            lockedAchievements.slice(0, 3).forEach(achievement => {
+                const achievementEl = document.createElement('div');
+                achievementEl.className = 'bg-gray-200 dark:bg-gray-700 rounded-lg p-4 opacity-60 hover:opacity-80 transition-opacity';
+                achievementEl.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <div class="text-2xl grayscale">🔒</div>
+                        <div>
+                            <h4 class="font-bold text-gray-600 dark:text-gray-400">${achievement.name}</h4>
+                            <p class="text-sm text-gray-500 dark:text-gray-500">${achievement.description}</p>
+                            <span class="text-xs bg-gray-300 dark:bg-gray-600 px-2 py-1 rounded mt-1 inline-block">Bloqueado</span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(achievementEl);
+            });
+        }
+
+        function showAchievementUnlocked(achievement) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-gradient-to-r from-yellow-400 to-orange-500 p-8 rounded-lg shadow-2xl max-w-sm w-full mx-4 text-center text-white transform animate-bounce">
+                    <div class="text-6xl mb-4 animate-pulse-slow">${achievement.icon}</div>
+                    <h3 class="text-2xl font-bold mb-2">🎉 Conquista Desbloqueada!</h3>
+                    <h4 class="text-xl font-semibold mb-2">${achievement.name}</h4>
+                    <p class="mb-4 opacity-90">${achievement.description}</p>
+                    <button class="bg-white text-orange-500 px-6 py-2 rounded-lg font-semibold hover:bg-gray-100 transition-colors" onclick="this.closest('.fixed').remove()">
+                        Incrível! 🎉
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (document.body.contains(modal)) {
+                    modal.remove();
+                }
+            }, 5000);
+        }
+
+        // Advanced Metrics Functions
+        function getWeeklyWorkouts() {
+            const now = new Date();
+            const weekStart = new Date(now.setDate(now.getDate() - now.getDay()));
+            return workouts.filter(w => new Date(w.date) >= weekStart).length;
+        }
+
+        function getCurrentStreak() {
+            if (workouts.length === 0) return 0;
+            
+            const sortedDates = workouts.map(w => new Date(w.date)).sort((a, b) => b - a);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            let streak = 0;
+            let currentDate = new Date(today);
+            
+            for (let i = 0; i < sortedDates.length; i++) {
+                const workoutDate = new Date(sortedDates[i]);
+                workoutDate.setHours(0, 0, 0, 0);
+                
+                if (workoutDate.getTime() === currentDate.getTime()) {
+                    streak++;
+                    currentDate.setDate(currentDate.getDate() - 1);
+                } else if (workoutDate.getTime() < currentDate.getTime()) {
+                    break;
+                }
+            }
+            
+            return streak;
+        }
+
+        function getTotalVolume() {
+            return workouts.reduce((sum, w) => sum + w.totalWeight, 0);
+        }
+
+        function getUniqueExercises() {
+            const unique = new Set();
+            workouts.forEach(w => {
+                w.exercises.forEach(e => unique.add(e.exercise));
+            });
+            return unique.size;
+        }
+
+        function getTotalTime() {
+            return workouts.reduce((sum, w) => sum + w.duration, 0);
+        }
+
+        function getStrengthLevel() {
+            const totalVolume = getTotalVolume();
+            const workoutCount = workouts.length;
+            const uniqueExercises = getUniqueExercises();
+            const avgVolume = workoutCount > 0 ? totalVolume / workoutCount : 0;
+            
+            // Advanced XP calculation considering multiple factors
+            const xp = Math.floor(
+                (totalVolume / 100) + 
+                (workoutCount * 10) + 
+                (uniqueExercises * 5) + 
+                (avgVolume * 2) +
+                (getCurrentStreak() * 3)
+            );
+            
+            let level = 1;
+            let levelName = 'Iniciante';
+            
+            if (xp >= 2000) { level = 5; levelName = 'Lenda'; }
+            else if (xp >= 1000) { level = 4; levelName = 'Elite'; }
+            else if (xp >= 500) { level = 3; levelName = 'Avançado'; }
+            else if (xp >= 200) { level = 2; levelName = 'Intermediário'; }
+            
+            const nextLevelXP = level === 1 ? 200 : level === 2 ? 500 : level === 3 ? 1000 : level === 4 ? 2000 : 5000;
+            
+            return { level, levelName, xp, nextLevelXP };
+        }
+
+        // AI-powered Insights with advanced analysis
+        function generateAIInsights() {
+            const container = document.getElementById('aiInsights');
+            if (!container || workouts.length === 0) {
+                container.innerHTML = '<p class="text-indigo-100">Registre alguns treinos para receber insights personalizados da IA!</p>';
+                return;
+            }
+            
+            const insights = [];
+            
+            // Advanced volume analysis
+            const recentVolume = workouts.slice(-5).reduce((sum, w) => sum + w.totalWeight, 0) / Math.min(5, workouts.length);
+            const avgVolume = getTotalVolume() / workouts.length;
+            
+            if (recentVolume > avgVolume * 1.3) {
+                insights.push("🚀 Impressionante! Seu volume aumentou drasticamente. Continue essa intensidade!");
+            } else if (recentVolume > avgVolume * 1.2) {
+                insights.push("📈 Excelente progresso no volume de treino! Você está evoluindo consistentemente.");
+            } else if (recentVolume < avgVolume * 0.7) {
+                insights.push("📉 Volume baixo detectado. Considere intensificar os treinos ou verificar se está descansando adequadamente.");
+            }
+            
+            // Advanced frequency analysis
+            const weeklyFreq = getWeeklyWorkouts();
+            const streak = getCurrentStreak();
+            
+            if (weeklyFreq >= 6) {
+                insights.push("⚠️ Cuidado com overtraining! 6+ treinos/semana pode ser excessivo. Considere dias de descanso.");
+            } else if (weeklyFreq >= 5) {
+                insights.push("🔥 Frequência excepcional! Você está demonstrando grande dedicação.");
+            } else if (weeklyFreq >= 3) {
+                insights.push("✅ Boa frequência de treinos! Mantenha essa consistência.");
+            } else if (weeklyFreq < 3) {
+                insights.push("⏰ Aumente a frequência para 3-4 treinos semanais para melhores resultados.");
+            }
+            
+            // Streak analysis
+            if (streak >= 14) {
+                insights.push("🔥 Streak incrível! Você é uma máquina de consistência. Cuidado para não se esgotar.");
+            } else if (streak >= 7) {
+                insights.push("👑 Uma semana completa de treinos! Você está construindo hábitos sólidos.");
+            }
+            
+            // Advanced muscle group analysis
+            const muscleCount = {};
+            const recentWorkouts = workouts.slice(-10);
+            recentWorkouts.forEach(workout => {
+                workout.exercises.forEach(exercise => {
+                    const exerciseData = exerciseDatabase.find(ex => ex.name === exercise.exercise);
+                    if (exerciseData) {
+                        muscleCount[exerciseData.muscle] = (muscleCount[exerciseData.muscle] || 0) + 1;
+                    }
+                });
+            });
+            
+            const muscleGroups = Object.entries(muscleCount).sort((a, b) => b[1] - a[1]);
+            if (muscleGroups.length >= 2) {
+                const [topMuscle, secondMuscle] = muscleGroups;
+                if (topMuscle[1] > secondMuscle[1] * 2) {
+                    insights.push(`⚖️ Desequilíbrio detectado: muito foco em ${topMuscle[0]}. Balance com mais ${secondMuscle[0]}.`);
+                }
+            }
+            
+            // Progressive overload analysis
+            const exerciseProgressions = {};
+            workouts.forEach(workout => {
+                workout.exercises.forEach(exercise => {
+                    if (!exerciseProgressions[exercise.exercise]) {
+                        exerciseProgressions[exercise.exercise] = [];
+                    }
+                    exerciseProgressions[exercise.exercise].push({
+                        date: workout.date,
+                        volume: exercise.weight * exercise.sets * exercise.reps
+                    });
+                });
+            });
+            
+            let progressingExercises = 0;
+            Object.values(exerciseProgressions).forEach(progression => {
+                if (progression.length >= 3) {
+                    progression.sort((a, b) => new Date(a.date) - new Date(b.date));
+                    const recent = progression.slice(-3);
+                    if (recent[2].volume > recent[0].volume) {
+                        progressingExercises++;
+                    }
+                }
+            });
+            
+            if (progressingExercises >= 3) {
+                insights.push("📊 Sobrecarga progressiva detectada em vários exercícios! Excelente metodologia.");
+            } else if (progressingExercises === 0 && workouts.length >= 10) {
+                insights.push("📊 Considere aplicar sobrecarga progressiva: aumente peso, séries ou repetições gradualmente.");
+            }
+            
+            // Recovery analysis
+            const workoutDates = workouts.map(w => new Date(w.date)).sort((a, b) => b - a);
+            let consecutiveDays = 0;
+            for (let i = 0; i < Math.min(7, workoutDates.length - 1); i++) {
+                const diffDays = (workoutDates[i] - workoutDates[i + 1]) / (1000 * 60 * 60 * 24);
+                if (diffDays === 1) {
+                    consecutiveDays++;
+                } else {
+                    break;
+                }
+            }
+            
+            if (consecutiveDays >= 5) {
+                insights.push("😴 Você treinou 5+ dias consecutivos. Seu corpo precisa de descanso para recuperação muscular.");
+            }
+            
+            // Performance prediction
+            if (workouts.length >= 5) {
+                const volumeTrend = workouts.slice(-5).reduce((sum, w, i) => sum + w.totalWeight * (i + 1), 0);
+                const baselineVolume = workouts.slice(-5).reduce((sum, w) => sum + w.totalWeight, 0);
+                
+                if (volumeTrend > baselineVolume * 3) {
+                    insights.push("🎯 Tendência ascendente forte! Continue assim e você pode dobrar seu volume em 2 meses.");
+                }
+            }
+            
+            // Motivational insights based on achievements
+            const unlockedCount = achievements.filter(a => a.unlocked).length;
+            const totalAchievements = achievements.length;
+            const achievementRate = (unlockedCount / totalAchievements) * 100;
+            
+            if (achievementRate >= 80) {
+                insights.push("🏆 Você é uma lenda! 80%+ das conquistas desbloqueadas. Inspire outros!");
+            } else if (achievementRate >= 50) {
+                insights.push("🌟 Metade das conquistas desbloqueadas! Você está no caminho da excelência.");
+            }
+            
+            // Default insights for beginners
+            if (insights.length === 0) {
+                insights.push("💡 Continue registrando treinos para receber insights personalizados!");
+                insights.push("🎯 Dica: Consistência é mais importante que intensidade no início.");
+                insights.push("📈 Foque em aprender a forma correta dos exercícios antes de aumentar o peso.");
+            }
+            
+            container.innerHTML = insights.map(insight => 
+                `<p class="text-indigo-100 mb-2 animate-fade-in">${insight}</p>`
+            ).join('');
+        }
+
+        // Enhanced Dashboard Updates with all advanced metrics
+        function updateAdvancedDashboard() {
+            // Update strength level with enhanced calculation
+            const strength = getStrengthLevel();
+            document.getElementById('strengthLevel').textContent = strength.levelName;
+            document.getElementById('strengthProgress').textContent = `XP: ${strength.xp}/${strength.nextLevelXP}`;
+            
+            // Update streak with motivation
+            const streak = getCurrentStreak();
+            document.getElementById('currentStreak').textContent = streak;
+            
+            const streakTarget = document.getElementById('streakTarget');
+            if (streak >= 30) {
+                streakTarget.textContent = "🔥 Lenda!";
+                streakTarget.className = "text-xs text-orange-200 animate-pulse-slow";
+            } else if (streak >= 14) {
+                streakTarget.textContent = "🚀 Incrível!";
+            } else if (streak >= 7) {
+                streakTarget.textContent = "👑 Uma semana!";
+            } else {
+                streakTarget.textContent = "Meta: 7 dias";
+            }
+            
+            // Update weekly volume with comparison
+            const weekStart = new Date();
+            weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+            const weeklyVolume = workouts
+                .filter(w => new Date(w.date) >= weekStart)
+                .reduce((sum, w) => sum + w.totalWeight, 0);
+            document.getElementById('weeklyVolume').textContent = weeklyVolume.toFixed(1);
+            
+            // Calculate advanced comparisons
+            const prevWeekStart = new Date(weekStart);
+            prevWeekStart.setDate(prevWeekStart.getDate() - 7);
+            const prevWeekEnd = new Date(weekStart);
+            prevWeekEnd.setDate(prevWeekEnd.getDate() - 1);
+            
+            const prevWeekWorkouts = workouts.filter(w => {
+                const date = new Date(w.date);
+                return date >= prevWeekStart && date <= prevWeekEnd;
+            }).length;
+            
+            const prevWeekVolume = workouts
+                .filter(w => {
+                    const date = new Date(w.date);
+                    return date >= prevWeekStart && date <= prevWeekEnd;
+                })
+                .reduce((sum, w) => sum + w.totalWeight, 0);
+            
+            const weeklyWorkouts = getWeeklyWorkouts();
+            const workoutChange = prevWeekWorkouts > 0 ? 
+                ((weeklyWorkouts - prevWeekWorkouts) / prevWeekWorkouts * 100).toFixed(0) : 0;
+            const volumeChange = prevWeekVolume > 0 ? 
+                ((weeklyVolume - prevWeekVolume) / prevWeekVolume * 100).toFixed(0) : 0;
+            
+            document.getElementById('weeklyChange').textContent = 
+                `${workoutChange >= 0 ? '+' : ''}${workoutChange}% vs semana anterior`;
+            document.getElementById('volumeChange').textContent = 
+                `${volumeChange >= 0 ? '+' : ''}${volumeChange}% vs semana anterior`;
+            
+            // Update achievements and AI insights
+            updateAchievements();
+            generateAIInsights();
+        }
+
         // Custom alert function
         function showCustomAlert(message) {
             const modal = document.createElement('div');
             modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
             modal.innerHTML = `
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-sm w-full mx-4">
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-sm w-full mx-4 animate-slide-up">
                     <p class="text-gray-700 dark:text-gray-300 mb-4">${message}</p>
                     <div class="flex justify-end">
-                        <button class="px-4 py-2 bg-primary text-white hover:bg-primary-dark rounded" onclick="this.closest('.fixed').remove()">OK</button>
+                        <button class="px-4 py-2 bg-primary text-white hover:bg-primary-dark rounded transition-colors" onclick="this.closest('.fixed').remove()">OK</button>
                     </div>
                 </div>
             `;

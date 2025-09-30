@@ -204,21 +204,76 @@
 
         <!-- Workout Tab -->
         <div id="workout" class="tab-content hidden">
-            <div class="max-w-2xl mx-auto">
+            <div class="max-w-4xl mx-auto">
                 <h2 class="text-3xl font-bold mb-6">Registrar Novo Treino</h2>
+                
+                <!-- Live Workout Timer -->
+                <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg p-6 text-white mb-6">
+                    <div class="text-center">
+                        <h3 class="text-xl font-bold mb-4">⏱️ Cronômetro de Treino Ao Vivo</h3>
+                        <div class="text-6xl font-bold mb-4" id="liveTimer">00:00:00</div>
+                        <div class="flex justify-center space-x-4 mb-4">
+                            <button id="startWorkoutBtn" onclick="startWorkoutTimer()" class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                                <i class="fas fa-play mr-2"></i>Iniciar Treino
+                            </button>
+                            <button id="pauseWorkoutBtn" onclick="pauseWorkoutTimer()" class="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors hidden">
+                                <i class="fas fa-pause mr-2"></i>Pausar
+                            </button>
+                            <button id="resumeWorkoutBtn" onclick="resumeWorkoutTimer()" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors hidden">
+                                <i class="fas fa-play mr-2"></i>Retomar
+                            </button>
+                            <button id="stopWorkoutBtn" onclick="stopWorkoutTimer()" class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors hidden">
+                                <i class="fas fa-stop mr-2"></i>Finalizar
+                            </button>
+                        </div>
+                        <div id="workoutStatus" class="text-sm opacity-90">
+                            <p id="startTimeDisplay" class="hidden">Início: <span id="startTimeText">--:--</span></p>
+                            <p id="statusText">Pressione "Iniciar Treino" para começar</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Exercise Timer -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
+                    <h3 class="text-lg font-bold mb-4">⚡ Timer Rápido Entre Séries</h3>
+                    <div class="flex items-center justify-between">
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-primary mb-2" id="quickTimer">0:00</div>
+                            <div class="space-x-2">
+                                <button onclick="startQuickTimer(30)" class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded text-sm">30s</button>
+                                <button onclick="startQuickTimer(60)" class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded text-sm">1min</button>
+                                <button onclick="startQuickTimer(90)" class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded text-sm">1:30</button>
+                                <button onclick="startQuickTimer(120)" class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded text-sm">2min</button>
+                            </div>
+                        </div>
+                        <div class="space-x-2">
+                            <button id="quickStartBtn" onclick="toggleQuickTimer()" class="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded">
+                                <i class="fas fa-play mr-1"></i>Iniciar
+                            </button>
+                            <button onclick="resetQuickTimer()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
+                                <i class="fas fa-stop mr-1"></i>Parar
+                            </button>
+                        </div>
+                    </div>
+                </div>
                 
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
                     <form id="workoutForm">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                             <div>
                                 <label class="block text-sm font-medium mb-2">Data do Treino</label>
                                 <input type="date" id="workoutDate" required
                                        class="w-full px-4 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium mb-2">Duração (minutos)</label>
-                                <input type="number" id="workoutDuration" required min="1" placeholder="60"
-                                       class="w-full px-4 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700">
+                                <label class="block text-sm font-medium mb-2">Hora de Início</label>
+                                <input type="time" id="workoutStartTime" readonly
+                                       class="w-full px-4 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-600">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Duração (automática)</label>
+                                <input type="text" id="workoutDurationDisplay" readonly placeholder="Use o cronômetro acima"
+                                       class="w-full px-4 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-600">
                             </div>
                         </div>
 
@@ -777,38 +832,6 @@
         // Clear workout form
         document.getElementById('clearForm').addEventListener('click', clearWorkoutForm);
 
-        function clearWorkoutForm() {
-            document.getElementById('workoutForm').reset();
-            document.getElementById('workoutDate').value = new Date().toISOString().split('T')[0];
-            
-            const container = document.getElementById('exerciseEntries');
-            container.innerHTML = `
-                <div class="exercise-entry bg-gray-50 dark:bg-gray-700 p-4 rounded-lg mb-4">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-                        <div>
-                            <label class="block text-sm font-medium mb-1">Exercício</label>
-                            <select class="exercise-select w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-primary bg-white dark:bg-gray-600">
-                                <option value="">Selecione...</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-1">Séries</label>
-                            <input type="number" class="sets w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700" min="1" placeholder="3">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-1">Repetições</label>
-                            <input type="number" class="reps w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700" min="1" placeholder="12">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-1">Peso (kg)</label>
-                            <input type="number" class="weight w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700" min="0" step="0.5" placeholder="20">
-                        </div>
-                    </div>
-                </div>
-            `;
-            populateExerciseSelects();
-        }
-
         // Update dashboard with advanced features
         function updateDashboard() {
             const now = new Date();
@@ -873,40 +896,7 @@
             updateAdvancedDashboard();
         }
 
-        // Update workout history
-        function updateWorkoutHistory() {
-            const container = document.getElementById('workoutHistory');
-            
-            if (workouts.length === 0) {
-                container.innerHTML = '<p class="text-gray-500 dark:text-gray-400 text-center py-8">Nenhum treino registrado ainda.</p>';
-                return;
-            }
-            
-            const sortedWorkouts = workouts.sort((a, b) => new Date(b.date) - new Date(a.date));
-            
-            container.innerHTML = sortedWorkouts.map(workout => `
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-xl font-bold">${new Date(workout.date).toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</h3>
-                        <div class="text-right">
-                            <p class="text-sm text-gray-600 dark:text-gray-400">Duração: ${workout.duration} min</p>
-                            <p class="font-medium text-primary">Total: ${workout.totalWeight.toFixed(1)}kg</p>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        ${workout.exercises.map(exercise => `
-                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded">
-                                <h4 class="font-medium mb-2">${exercise.exercise}</h4>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">
-                                    ${exercise.sets} séries × ${exercise.reps} reps
-                                    ${exercise.weight > 0 ? ` @ ${exercise.weight}kg` : ''}
-                                </p>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            `).join('');
-        }
+
 
         // Show success message
         function showSuccessMessage(message) {
@@ -1953,6 +1943,393 @@
             // Update achievements and AI insights
             updateAchievements();
             generateAIInsights();
+        }
+
+        // Live Workout Timer System
+        let workoutTimerInterval = null;
+        let workoutStartTime = null;
+        let workoutEndTime = null;
+        let workoutPausedTime = 0;
+        let workoutTotalPausedTime = 0;
+        let isWorkoutRunning = false;
+        let isWorkoutPaused = false;
+
+        function startWorkoutTimer() {
+            if (!isWorkoutRunning) {
+                workoutStartTime = new Date();
+                workoutTotalPausedTime = 0;
+                isWorkoutRunning = true;
+                isWorkoutPaused = false;
+                
+                // Update UI
+                const startTimeText = workoutStartTime.toLocaleTimeString('pt-BR', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                document.getElementById('workoutStartTime').value = startTimeText;
+                document.getElementById('startTimeText').textContent = startTimeText;
+                document.getElementById('startTimeDisplay').classList.remove('hidden');
+                document.getElementById('statusText').textContent = 'Treino em andamento...';
+                
+                // Show/hide buttons
+                document.getElementById('startWorkoutBtn').classList.add('hidden');
+                document.getElementById('pauseWorkoutBtn').classList.remove('hidden');
+                document.getElementById('stopWorkoutBtn').classList.remove('hidden');
+                
+                // Start live timer
+                workoutTimerInterval = setInterval(updateLiveTimer, 1000);
+                
+                showSuccessMessage('Treino iniciado! Boa sorte! 💪');
+            }
+        }
+
+        function pauseWorkoutTimer() {
+            if (isWorkoutRunning && !isWorkoutPaused) {
+                workoutPausedTime = new Date();
+                isWorkoutPaused = true;
+                clearInterval(workoutTimerInterval);
+                
+                // Update UI
+                document.getElementById('statusText').textContent = 'Treino pausado - Descanse um pouco!';
+                document.getElementById('pauseWorkoutBtn').classList.add('hidden');
+                document.getElementById('resumeWorkoutBtn').classList.remove('hidden');
+                
+                showSuccessMessage('Treino pausado. Hidrate-se! 💧');
+            }
+        }
+
+        function resumeWorkoutTimer() {
+            if (isWorkoutRunning && isWorkoutPaused) {
+                workoutTotalPausedTime += new Date() - workoutPausedTime;
+                isWorkoutPaused = false;
+                
+                // Update UI
+                document.getElementById('statusText').textContent = 'Treino em andamento...';
+                document.getElementById('resumeWorkoutBtn').classList.add('hidden');
+                document.getElementById('pauseWorkoutBtn').classList.remove('hidden');
+                
+                // Restart live timer
+                workoutTimerInterval = setInterval(updateLiveTimer, 1000);
+                
+                showSuccessMessage('Treino retomado! Vamos lá! 🚀');
+            }
+        }
+
+        function stopWorkoutTimer() {
+            if (isWorkoutRunning) {
+                workoutEndTime = new Date();
+                if (isWorkoutPaused) {
+                    workoutTotalPausedTime += workoutEndTime - workoutPausedTime;
+                }
+                
+                const totalDuration = Math.round((workoutEndTime - workoutStartTime - workoutTotalPausedTime) / 1000 / 60);
+                
+                // Update UI
+                document.getElementById('workoutDurationDisplay').value = `${totalDuration} minutos`;
+                document.getElementById('statusText').innerHTML = `
+                    <span class="text-green-400">Treino finalizado!</span><br>
+                    Duração: ${totalDuration} min | Pausas: ${Math.round(workoutTotalPausedTime / 1000 / 60)} min
+                `;
+                
+                // Reset timer display
+                document.getElementById('liveTimer').textContent = '00:00:00';
+                
+                // Show/hide buttons
+                document.getElementById('startWorkoutBtn').classList.remove('hidden');
+                document.getElementById('pauseWorkoutBtn').classList.add('hidden');
+                document.getElementById('resumeWorkoutBtn').classList.add('hidden');
+                document.getElementById('stopWorkoutBtn').classList.add('hidden');
+                
+                // Clear interval
+                clearInterval(workoutTimerInterval);
+                
+                // Reset state
+                isWorkoutRunning = false;
+                isWorkoutPaused = false;
+                
+                showSuccessMessage(`Parabéns! Treino de ${totalDuration} minutos concluído! 🎉`);
+            }
+        }
+
+        function updateLiveTimer() {
+            if (isWorkoutRunning && !isWorkoutPaused) {
+                const now = new Date();
+                const elapsed = now - workoutStartTime - workoutTotalPausedTime;
+                
+                const hours = Math.floor(elapsed / 1000 / 60 / 60);
+                const minutes = Math.floor((elapsed / 1000 / 60) % 60);
+                const seconds = Math.floor((elapsed / 1000) % 60);
+                
+                const display = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                document.getElementById('liveTimer').textContent = display;
+            }
+        }
+
+        // Quick Timer for Rest Between Sets
+        let quickTimerInterval = null;
+        let quickTimerSeconds = 0;
+        let isQuickTimerRunning = false;
+
+        function startQuickTimer(seconds) {
+            resetQuickTimer();
+            quickTimerSeconds = seconds;
+            updateQuickTimerDisplay();
+            toggleQuickTimer();
+        }
+
+        function toggleQuickTimer() {
+            if (isQuickTimerRunning) {
+                pauseQuickTimer();
+            } else {
+                startQuickTimerCountdown();
+            }
+        }
+
+        function startQuickTimerCountdown() {
+            if (quickTimerSeconds === 0) {
+                quickTimerSeconds = 60; // Default 1 minute
+            }
+            
+            isQuickTimerRunning = true;
+            document.getElementById('quickStartBtn').innerHTML = '<i class="fas fa-pause mr-1"></i>Pausar';
+            
+            quickTimerInterval = setInterval(() => {
+                quickTimerSeconds--;
+                updateQuickTimerDisplay();
+                
+                if (quickTimerSeconds <= 0) {
+                    resetQuickTimer();
+                    showSuccessMessage('⏰ Descanso finalizado! Próxima série!');
+                    
+                    // Play notification sound effect simulation
+                    flashQuickTimer();
+                }
+            }, 1000);
+        }
+
+        function pauseQuickTimer() {
+            isQuickTimerRunning = false;
+            clearInterval(quickTimerInterval);
+            document.getElementById('quickStartBtn').innerHTML = '<i class="fas fa-play mr-1"></i>Retomar';
+        }
+
+        function resetQuickTimer() {
+            isQuickTimerRunning = false;
+            clearInterval(quickTimerInterval);
+            quickTimerSeconds = 0;
+            updateQuickTimerDisplay();
+            document.getElementById('quickStartBtn').innerHTML = '<i class="fas fa-play mr-1"></i>Iniciar';
+        }
+
+        function updateQuickTimerDisplay() {
+            const minutes = Math.floor(quickTimerSeconds / 60);
+            const seconds = quickTimerSeconds % 60;
+            document.getElementById('quickTimer').textContent = 
+                `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function flashQuickTimer() {
+            const timerDisplay = document.getElementById('quickTimer');
+            let flashCount = 0;
+            const flashInterval = setInterval(() => {
+                timerDisplay.classList.toggle('text-red-500');
+                timerDisplay.classList.toggle('text-primary');
+                flashCount++;
+                if (flashCount >= 6) {
+                    clearInterval(flashInterval);
+                    timerDisplay.classList.remove('text-red-500');
+                    timerDisplay.classList.add('text-primary');
+                }
+            }, 300);
+        }
+
+        // Enhanced Workout Form Submission with Timer Data
+        document.getElementById('workoutForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const date = document.getElementById('workoutDate').value;
+            let duration;
+            
+            // Get duration from timer or manual input
+            const durationDisplay = document.getElementById('workoutDurationDisplay').value;
+            if (durationDisplay && durationDisplay.includes('minutos')) {
+                duration = parseInt(durationDisplay.split(' ')[0]);
+            } else {
+                showCustomAlert('Por favor, use o cronômetro para cronometrar seu treino!');
+                return;
+            }
+            
+            const exercises = [];
+            const entries = document.querySelectorAll('.exercise-entry');
+            
+            entries.forEach(entry => {
+                const exercise = entry.querySelector('.exercise-select').value;
+                const sets = parseInt(entry.querySelector('.sets').value);
+                const reps = parseInt(entry.querySelector('.reps').value);
+                const weight = parseFloat(entry.querySelector('.weight').value) || 0;
+                
+                if (exercise && sets && reps) {
+                    exercises.push({ exercise, sets, reps, weight });
+                }
+            });
+            
+            if (exercises.length === 0) {
+                showCustomAlert('Adicione pelo menos um exercício ao treino!');
+                return;
+            }
+            
+            const workout = {
+                id: Date.now(),
+                date,
+                duration,
+                startTime: workoutStartTime ? workoutStartTime.toISOString() : null,
+                endTime: workoutEndTime ? workoutEndTime.toISOString() : null,
+                pausedTime: Math.round(workoutTotalPausedTime / 1000 / 60), // em minutos
+                exercises,
+                totalWeight: exercises.reduce((sum, ex) => sum + (ex.weight * ex.sets * ex.reps), 0)
+            };
+            
+            workouts.push(workout);
+            
+            showSuccessMessage('Treino salvo com sucesso! Parabéns pelo esforço! 🏆');
+            clearWorkoutForm();
+            updateDashboard();
+            updateWorkoutHistory();
+            
+            // Reset workout timer state
+            resetWorkoutTimerState();
+        });
+
+        function resetWorkoutTimerState() {
+            workoutStartTime = null;
+            workoutEndTime = null;
+            workoutPausedTime = 0;
+            workoutTotalPausedTime = 0;
+            isWorkoutRunning = false;
+            isWorkoutPaused = false;
+            
+            // Reset UI
+            document.getElementById('liveTimer').textContent = '00:00:00';
+            document.getElementById('workoutStartTime').value = '';
+            document.getElementById('workoutDurationDisplay').value = '';
+            document.getElementById('startTimeDisplay').classList.add('hidden');
+            document.getElementById('statusText').textContent = 'Pressione "Iniciar Treino" para começar';
+            
+            document.getElementById('startWorkoutBtn').classList.remove('hidden');
+            document.getElementById('pauseWorkoutBtn').classList.add('hidden');
+            document.getElementById('resumeWorkoutBtn').classList.add('hidden');
+            document.getElementById('stopWorkoutBtn').classList.add('hidden');
+            
+            clearInterval(workoutTimerInterval);
+        }
+
+        // Enhanced Clear Form Function
+        function clearWorkoutForm() {
+            document.getElementById('workoutForm').reset();
+            document.getElementById('workoutDate').value = new Date().toISOString().split('T')[0];
+            
+            const container = document.getElementById('exerciseEntries');
+            container.innerHTML = `
+                <div class="exercise-entry bg-gray-50 dark:bg-gray-700 p-4 rounded-lg mb-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Exercício</label>
+                            <select class="exercise-select w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-primary bg-white dark:bg-gray-600">
+                                <option value="">Selecione...</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Séries</label>
+                            <input type="number" class="sets w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700" min="1" placeholder="3">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Repetições</label>
+                            <input type="number" class="reps w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700" min="1" placeholder="12">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Peso (kg)</label>
+                            <input type="number" class="weight w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700" min="0" step="0.5" placeholder="20">
+                        </div>
+                    </div>
+                </div>
+            `;
+            populateExerciseSelects();
+            resetWorkoutTimerState();
+        }
+
+        // Enhanced Workout History with Time Details
+        function updateWorkoutHistory() {
+            const container = document.getElementById('workoutHistory');
+            
+            if (workouts.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 dark:text-gray-400 text-center py-8">Nenhum treino registrado ainda.</p>';
+                return;
+            }
+            
+            const sortedWorkouts = workouts.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            container.innerHTML = sortedWorkouts.map(workout => {
+                const workoutDate = new Date(workout.date);
+                const startTime = workout.startTime ? new Date(workout.startTime).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : 'N/A';
+                const endTime = workout.endTime ? new Date(workout.endTime).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : 'N/A';
+                const pausedTime = workout.pausedTime || 0;
+                
+                return `
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold">${workoutDate.toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</h3>
+                        <div class="text-right">
+                            <p class="text-sm text-gray-600 dark:text-gray-400">
+                                ${startTime !== 'N/A' ? `${startTime} - ${endTime}` : 'Horário não registrado'}
+                            </p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">
+                                Duração: ${workout.duration} min ${pausedTime > 0 ? `(${pausedTime} min pausado)` : ''}
+                            </p>
+                            <p class="font-medium text-primary">Volume: ${workout.totalWeight.toFixed(1)}kg</p>
+                            <button onclick="deleteWorkout(${workout.id})" class="text-red-500 hover:text-red-700 text-sm mt-1">
+                                <i class="fas fa-trash mr-1"></i>Excluir
+                            </button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        ${workout.exercises.map(exercise => `
+                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
+                                <h4 class="font-medium mb-2">${exercise.exercise}</h4>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">
+                                    ${exercise.sets} séries × ${exercise.reps} reps
+                                    ${exercise.weight > 0 ? ` @ ${exercise.weight}kg` : ''}
+                                </p>
+                                <p class="text-xs text-primary mt-1">
+                                    Volume: ${(exercise.weight * exercise.sets * exercise.reps).toFixed(1)}kg
+                                </p>
+                            </div>
+                        `).join('')}
+                    </div>
+                    ${workout.startTime ? `
+                        <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                                <div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Início</p>
+                                    <p class="font-medium">${startTime}</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Fim</p>
+                                    <p class="font-medium">${endTime}</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Duração Efetiva</p>
+                                    <p class="font-medium text-green-600">${workout.duration - pausedTime} min</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Intensidade</p>
+                                    <p class="font-medium text-primary">${(workout.totalWeight / workout.duration).toFixed(1)} kg/min</p>
+                                </div>
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            }).join('');
         }
 
         // Custom alert function

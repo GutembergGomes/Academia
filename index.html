@@ -1438,8 +1438,27 @@
                         <div id="exerciseList" class="space-y-4">
                             <div class="text-center py-12">
                                 <div class="text-6xl mb-4 animate-bounce">🎯</div>
-                                <h4 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Escolha Sua Batalha!</h4>
-                                <p class="text-gray-500">Selecione um tipo de treino acima para começar a devastação</p>
+                                <h4 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Sistema de Treino Inteligente</h4>
+                                <p class="text-gray-500">Selecione um tipo de treino ou deixe a IA criar o plano perfeito para você</p>
+                                
+                                <!-- Quick Start Options -->
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6 max-w-2xl mx-auto">
+                                    <button id="quickStart15" class="group relative p-4 bg-gradient-to-br from-green-400 to-green-600 text-white rounded-2xl font-bold transition-all hover:scale-105">
+                                        <div class="text-2xl mb-2">⚡</div>
+                                        <div class="text-sm">Quick Start</div>
+                                        <div class="text-xs opacity-90">15 min</div>
+                                    </button>
+                                    <button id="quickStart30" class="group relative p-4 bg-gradient-to-br from-blue-400 to-blue-600 text-white rounded-2xl font-bold transition-all hover:scale-105">
+                                        <div class="text-2xl mb-2">💪</div>
+                                        <div class="text-sm">Treino Médio</div>
+                                        <div class="text-xs opacity-90">30 min</div>
+                                    </button>
+                                    <button id="quickStart60" class="group relative p-4 bg-gradient-to-br from-purple-400 to-purple-600 text-white rounded-2xl font-bold transition-all hover:scale-105">
+                                        <div class="text-2xl mb-2">🔥</div>
+                                        <div class="text-sm">Beast Mode</div>
+                                        <div class="text-xs opacity-90">60+ min</div>
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
@@ -4079,29 +4098,145 @@
             const container = document.getElementById('exerciseList');
             
             if (currentWorkout.exercises.length === 0) {
-                container.innerHTML = '<p class="text-gray-500 text-center py-4">Selecione um tipo de treino acima para começar!</p>';
+                container.innerHTML = `
+                    <div class="text-center py-12">
+                        <div class="text-6xl mb-4 animate-bounce">🎯</div>
+                        <h4 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Sistema de Treino Inteligente</h4>
+                        <p class="text-gray-500">Selecione um tipo de treino ou deixe a IA criar o plano perfeito para você</p>
+                        
+                        <!-- Quick Start Options -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6 max-w-2xl mx-auto">
+                            <button id="quickStart15" class="group relative p-4 bg-gradient-to-br from-green-400 to-green-600 text-white rounded-2xl font-bold transition-all hover:scale-105">
+                                <div class="text-2xl mb-2">⚡</div>
+                                <div class="text-sm">Quick Start</div>
+                                <div class="text-xs opacity-90">15 min</div>
+                            </button>
+                            <button id="quickStart30" class="group relative p-4 bg-gradient-to-br from-blue-400 to-blue-600 text-white rounded-2xl font-bold transition-all hover:scale-105">
+                                <div class="text-2xl mb-2">💪</div>
+                                <div class="text-sm">Treino Médio</div>
+                                <div class="text-xs opacity-90">30 min</div>
+                            </button>
+                            <button id="quickStart60" class="group relative p-4 bg-gradient-to-br from-purple-400 to-purple-600 text-white rounded-2xl font-bold transition-all hover:scale-105">
+                                <div class="text-2xl mb-2">🔥</div>
+                                <div class="text-sm">Beast Mode</div>
+                                <div class="text-xs opacity-90">60+ min</div>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                // Add event listeners for quick start buttons
+                setTimeout(() => {
+                    document.getElementById('quickStart15')?.addEventListener('click', () => generateQuickWorkout(15));
+                    document.getElementById('quickStart30')?.addEventListener('click', () => generateQuickWorkout(30));
+                    document.getElementById('quickStart60')?.addEventListener('click', () => generateQuickWorkout(60));
+                }, 100);
+                
                 return;
             }
             
             container.innerHTML = currentWorkout.exercises.map((exercise, index) => `
-                <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                    <div class="flex justify-between items-start mb-3">
-                        <h4 class="font-medium">${exercise.name}</h4>
-                        <button onclick="removeExercise(${index})" class="text-red-500 hover:text-red-700 text-sm">Remover</button>
-                    </div>
-                    <div class="grid grid-cols-3 gap-3">
-                        <div>
-                            <label class="block text-xs text-gray-600 dark:text-gray-400 mb-1">Séries</label>
-                            <input type="number" value="${exercise.sets}" onchange="updateExercise(${index}, 'sets', this.value)" class="w-full p-2 border rounded dark:bg-gray-600 dark:border-gray-500 text-sm">
+                <div class="relative group">
+                    <div class="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
+                    <div class="relative bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold">
+                                    ${index + 1}
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-lg text-gray-900 dark:text-white">${exercise.name}</h4>
+                                    <p class="text-sm text-gray-500">Volume: ${(exercise.sets * exercise.reps * exercise.weight).toFixed(0)}kg</p>
+                                </div>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button onclick="addSuperset(${index})" class="px-3 py-1 bg-yellow-500 text-white rounded-lg text-xs font-bold hover:bg-yellow-600 transition-colors">
+                                    🔗 Superset
+                                </button>
+                                <button onclick="duplicateExercise(${index})" class="px-3 py-1 bg-green-500 text-white rounded-lg text-xs font-bold hover:bg-green-600 transition-colors">
+                                    📋 Duplicar
+                                </button>
+                                <button onclick="removeExercise(${index})" class="px-3 py-1 bg-red-500 text-white rounded-lg text-xs font-bold hover:bg-red-600 transition-colors">
+                                    🗑️ Remover
+                                </button>
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-xs text-gray-600 dark:text-gray-400 mb-1">Reps</label>
-                            <input type="number" value="${exercise.reps}" onchange="updateExercise(${index}, 'reps', this.value)" class="w-full p-2 border rounded dark:bg-gray-600 dark:border-gray-500 text-sm">
+                        
+                        <div class="grid grid-cols-3 lg:grid-cols-6 gap-3 mb-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">🔢 Séries</label>
+                                <input type="number" value="${exercise.sets}" onchange="updateExercise(${index}, 'sets', this.value)" 
+                                       class="w-full p-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl dark:bg-gray-700 text-base font-medium focus:border-blue-500 transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">🔄 Reps</label>
+                                <input type="number" value="${exercise.reps}" onchange="updateExercise(${index}, 'reps', this.value)" 
+                                       class="w-full p-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl dark:bg-gray-700 text-base font-medium focus:border-blue-500 transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">⚖️ Peso (kg)</label>
+                                <input type="number" value="${exercise.weight}" onchange="updateExercise(${index}, 'weight', this.value)" 
+                                       class="w-full p-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl dark:bg-gray-700 text-base font-medium focus:border-blue-500 transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">⏱️ Descanso (s)</label>
+                                <input type="number" value="${exercise.rest || 60}" onchange="updateExercise(${index}, 'rest', this.value)" 
+                                       class="w-full p-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl dark:bg-gray-700 text-base font-medium focus:border-blue-500 transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">💪 RPE</label>
+                                <select onchange="updateExercise(${index}, 'rpe', this.value)" 
+                                        class="w-full p-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl dark:bg-gray-700 text-base font-medium focus:border-blue-500 transition-all">
+                                    <option value="6" ${(exercise.rpe || 7) == 6 ? 'selected' : ''}>6 - Fácil</option>
+                                    <option value="7" ${(exercise.rpe || 7) == 7 ? 'selected' : ''}>7 - Moderado</option>
+                                    <option value="8" ${(exercise.rpe || 7) == 8 ? 'selected' : ''}>8 - Difícil</option>
+                                    <option value="9" ${(exercise.rpe || 7) == 9 ? 'selected' : ''}>9 - Muito Difícil</option>
+                                    <option value="10" ${(exercise.rpe || 7) == 10 ? 'selected' : ''}>10 - Máximo</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">🎯 Técnica</label>
+                                <select onchange="updateExercise(${index}, 'technique', this.value)" 
+                                        class="w-full p-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl dark:bg-gray-700 text-base font-medium focus:border-blue-500 transition-all">
+                                    <option value="normal" ${(exercise.technique || 'normal') === 'normal' ? 'selected' : ''}>Normal</option>
+                                    <option value="dropset" ${(exercise.technique || 'normal') === 'dropset' ? 'selected' : ''}>Drop Set</option>
+                                    <option value="rest-pause" ${(exercise.technique || 'normal') === 'rest-pause' ? 'selected' : ''}>Rest-Pause</option>
+                                    <option value="21s" ${(exercise.technique || 'normal') === '21s' ? 'selected' : ''}>21s</option>
+                                    <option value="tempo" ${(exercise.technique || 'normal') === 'tempo' ? 'selected' : ''}>Tempo</option>
+                                </select>
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-xs text-gray-600 dark:text-gray-400 mb-1">Peso (kg)</label>
-                            <input type="number" value="${exercise.weight}" onchange="updateExercise(${index}, 'weight', this.value)" class="w-full p-2 border rounded dark:bg-gray-600 dark:border-gray-500 text-sm">
+                        
+                        <!-- Exercise Notes -->
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">📝 Notas/Observações</label>
+                            <textarea onchange="updateExercise(${index}, 'notes', this.value)" 
+                                      placeholder="Ex: Foco na contração, aumentar peso próxima sessão..."
+                                      class="w-full p-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl dark:bg-gray-700 text-base resize-none focus:border-blue-500 transition-all"
+                                      rows="2">${exercise.notes || ''}</textarea>
                         </div>
+                        
+                        <!-- Performance Tracking -->
+                        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
+                            <div class="text-center">
+                                <div class="text-2xl font-black text-blue-600 dark:text-blue-400">${exercise.sets}</div>
+                                <div class="text-xs font-bold text-gray-600 dark:text-gray-400">SÉRIES</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-black text-green-600 dark:text-green-400">${exercise.reps}</div>
+                                <div class="text-xs font-bold text-gray-600 dark:text-gray-400">REPS</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-black text-purple-600 dark:text-purple-400">${exercise.weight}kg</div>
+                                <div class="text-xs font-bold text-gray-600 dark:text-gray-400">PESO</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-black text-orange-600 dark:text-orange-400">${(exercise.sets * exercise.reps * exercise.weight).toFixed(0)}kg</div>
+                                <div class="text-xs font-bold text-gray-600 dark:text-gray-400">VOLUME</div>
+                            </div>
+                        </div>
+                        
+                        ${exercise.isSuperset ? '<div class="absolute top-2 left-2 bg-yellow-500 text-white px-2 py-1 rounded-full text-xs font-bold">🔗 SUPERSET</div>' : ''}
                     </div>
                 </div>
             `).join('');
@@ -4127,6 +4262,232 @@
             
             document.getElementById('exerciseCount').textContent = exerciseCount;
             document.getElementById('currentVolume').textContent = totalVolume + 'kg';
+            
+            // Update other displays if they exist
+            const totalSetsElement = document.getElementById('totalSets');
+            const intensityScoreElement = document.getElementById('intensityScore');
+            const exerciseCountDisplayElement = document.getElementById('exerciseCountDisplay');
+            
+            if (totalSetsElement) totalSetsElement.textContent = totalSets;
+            if (exerciseCountDisplayElement) exerciseCountDisplayElement.textContent = exerciseCount;
+            
+            // Calculate intensity score based on RPE and volume
+            let intensityScore = '-';
+            if (exerciseCount > 0) {
+                const avgRPE = currentWorkout.exercises.reduce((total, ex) => total + (ex.rpe || 7), 0) / exerciseCount;
+                const volumePerExercise = totalVolume / exerciseCount;
+                
+                if (avgRPE >= 9 && volumePerExercise >= 200) {
+                    intensityScore = 'EXTREMA 🔥';
+                } else if (avgRPE >= 8 && volumePerExercise >= 150) {
+                    intensityScore = 'ALTA 💪';
+                } else if (avgRPE >= 7 && volumePerExercise >= 100) {
+                    intensityScore = 'MODERADA ⚡';
+                } else {
+                    intensityScore = 'LEVE 🌟';
+                }
+            }
+            
+            if (intensityScoreElement) intensityScoreElement.textContent = intensityScore;
+        }
+
+        // Generate Quick Workout Functions
+        function generateQuickWorkout(duration) {
+            let workoutTemplate = [];
+            
+            if (duration === 15) {
+                // Quick 15-minute workout
+                workoutTemplate = [
+                    { name: 'Flexão de Braço', sets: 3, reps: 10, weight: 0, rest: 45 },
+                    { name: 'Agachamento', sets: 3, reps: 12, weight: 0, rest: 45 },
+                    { name: 'Prancha', sets: 3, reps: 30, weight: 0, rest: 45 },
+                    { name: 'Jumping Jacks', sets: 3, reps: 20, weight: 0, rest: 30 }
+                ];
+            } else if (duration === 30) {
+                // Balanced 30-minute workout
+                workoutTemplate = [
+                    { name: 'Agachamento', sets: 4, reps: 12, weight: 0, rest: 60 },
+                    { name: 'Flexão de Braço', sets: 3, reps: 10, weight: 0, rest: 60 },
+                    { name: 'Afundo', sets: 3, reps: 10, weight: 0, rest: 60 },
+                    { name: 'Prancha', sets: 3, reps: 45, weight: 0, rest: 45 },
+                    { name: 'Mountain Climber', sets: 3, reps: 20, weight: 0, rest: 45 },
+                    { name: 'Burpees', sets: 2, reps: 8, weight: 0, rest: 60 }
+                ];
+            } else if (duration === 60) {
+                // Beast Mode 60+ minute workout
+                workoutTemplate = [
+                    { name: 'Agachamento', sets: 5, reps: 12, weight: 0, rest: 90 },
+                    { name: 'Flexão de Braço', sets: 4, reps: 12, weight: 0, rest: 75 },
+                    { name: 'Afundo', sets: 4, reps: 12, weight: 0, rest: 75 },
+                    { name: 'Prancha', sets: 4, reps: 60, weight: 0, rest: 60 },
+                    { name: 'Puxada Frontal', sets: 4, reps: 10, weight: 40, rest: 90 },
+                    { name: 'Desenvolvimento', sets: 4, reps: 10, weight: 25, rest: 90 },
+                    { name: 'Rosca Direta', sets: 3, reps: 12, weight: 15, rest: 60 },
+                    { name: 'Tríceps Pulley', sets: 3, reps: 12, weight: 20, rest: 60 },
+                    { name: 'Burpees', sets: 3, reps: 10, weight: 0, rest: 90 }
+                ];
+            }
+            
+            currentWorkout.exercises = workoutTemplate;
+            currentWorkout.type = `Quick ${duration}min`;
+            currentWorkout.isQuickStart = true;
+            
+            renderExerciseList();
+            showSuccess(`Treino Quick Start de ${duration} minutos criado! 🚀`);
+        }
+
+        // Advanced Exercise Functions
+        function addSuperset(index) {
+            if (index < currentWorkout.exercises.length - 1) {
+                // Mark current and next exercise as superset
+                currentWorkout.exercises[index].isSuperset = true;
+                currentWorkout.exercises[index + 1].isSuperset = true;
+                currentWorkout.exercises[index].supersetWith = index + 1;
+                currentWorkout.exercises[index + 1].supersetWith = index;
+                
+                renderExerciseList();
+                showSuccess('Superset criado! Execute os dois exercícios em sequência.');
+            } else {
+                showSuccess('Adicione pelo menos mais um exercício para criar um superset.');
+            }
+        }
+
+        function duplicateExercise(index) {
+            const originalExercise = currentWorkout.exercises[index];
+            const duplicatedExercise = {
+                ...originalExercise,
+                name: originalExercise.name + ' (Cópia)',
+                isSuperset: false,
+                supersetWith: null
+            };
+            
+            // Insert after the original exercise
+            currentWorkout.exercises.splice(index + 1, 0, duplicatedExercise);
+            
+            renderExerciseList();
+            showSuccess('Exercício duplicado com sucesso!');
+        }
+
+        function removeSuperset(index) {
+            const exercise = currentWorkout.exercises[index];
+            if (exercise.isSuperset && exercise.supersetWith !== null) {
+                const partnerIndex = exercise.supersetWith;
+                
+                // Remove superset flags from both exercises
+                currentWorkout.exercises[index].isSuperset = false;
+                currentWorkout.exercises[index].supersetWith = null;
+                
+                if (currentWorkout.exercises[partnerIndex]) {
+                    currentWorkout.exercises[partnerIndex].isSuperset = false;
+                    currentWorkout.exercises[partnerIndex].supersetWith = null;
+                }
+                
+                renderExerciseList();
+                showSuccess('Superset removido.');
+            }
+        }
+
+        // AI Workout Optimization (placeholder for future IA integration)
+        function optimizeWorkout() {
+            if (currentWorkout.exercises.length === 0) {
+                showSuccess('Adicione exercícios primeiro para otimizar o treino!');
+                return;
+            }
+            
+            // Simple optimization logic - can be enhanced with actual AI
+            const optimizations = [];
+            
+            // Check for muscle group balance
+            const muscleGroups = {};
+            currentWorkout.exercises.forEach(ex => {
+                // Simple muscle group detection based on exercise name
+                if (ex.name.includes('Agachamento') || ex.name.includes('Leg')) {
+                    muscleGroups.legs = (muscleGroups.legs || 0) + 1;
+                } else if (ex.name.includes('Supino') || ex.name.includes('Flexão') || ex.name.includes('Peito')) {
+                    muscleGroups.chest = (muscleGroups.chest || 0) + 1;
+                } else if (ex.name.includes('Puxada') || ex.name.includes('Remada') || ex.name.includes('Costas')) {
+                    muscleGroups.back = (muscleGroups.back || 0) + 1;
+                }
+            });
+            
+            // Check workout duration
+            const estimatedDuration = currentWorkout.exercises.reduce((total, ex) => {
+                const exerciseTime = (ex.sets * ex.reps * 3) + (ex.sets * (ex.rest || 60));
+                return total + exerciseTime;
+            }, 0);
+            
+            if (estimatedDuration > 5400) { // > 90 minutes
+                optimizations.push('⏰ Treino muito longo - considere reduzir séries ou exercícios');
+            } else if (estimatedDuration < 1800) { // < 30 minutes
+                optimizations.push('⚡ Treino curto - considere adicionar mais exercícios');
+            }
+            
+            // Volume optimization
+            const totalVolume = currentWorkout.exercises.reduce((total, ex) => total + (ex.sets * ex.reps * ex.weight), 0);
+            if (totalVolume < 1000) {
+                optimizations.push('💪 Volume baixo - considere aumentar pesos ou repetições');
+            }
+            
+            // Display optimizations
+            if (optimizations.length > 0) {
+                const message = 'Sugestões de Otimização:\n\n' + optimizations.join('\n\n');
+                showSuccess(message);
+            } else {
+                showSuccess('🎯 Treino bem equilibrado! Excelente distribuição de volume e intensidade.');
+            }
+        }
+
+        // Load Training Templates
+        function loadTemplate() {
+            const templates = [
+                {
+                    name: 'Push Day',
+                    exercises: [
+                        { name: 'Supino Reto', sets: 4, reps: 8, weight: 60, rest: 120 },
+                        { name: 'Desenvolvimento', sets: 4, reps: 10, weight: 40, rest: 90 },
+                        { name: 'Supino Inclinado', sets: 3, reps: 10, weight: 50, rest: 90 },
+                        { name: 'Elevação Lateral', sets: 3, reps: 12, weight: 12, rest: 60 },
+                        { name: 'Tríceps Pulley', sets: 3, reps: 12, weight: 25, rest: 60 },
+                        { name: 'Tríceps Francês', sets: 3, reps: 10, weight: 20, rest: 60 }
+                    ]
+                },
+                {
+                    name: 'Pull Day',
+                    exercises: [
+                        { name: 'Puxada Frontal', sets: 4, reps: 8, weight: 55, rest: 120 },
+                        { name: 'Remada Baixa', sets: 4, reps: 10, weight: 50, rest: 90 },
+                        { name: 'Puxada Aberta', sets: 3, reps: 10, weight: 45, rest: 90 },
+                        { name: 'Face Pull', sets: 3, reps: 15, weight: 15, rest: 60 },
+                        { name: 'Rosca Direta', sets: 3, reps: 10, weight: 25, rest: 60 },
+                        { name: 'Rosca Martelo', sets: 3, reps: 12, weight: 20, rest: 60 }
+                    ]
+                },
+                {
+                    name: 'Leg Day',
+                    exercises: [
+                        { name: 'Agachamento', sets: 5, reps: 8, weight: 80, rest: 150 },
+                        { name: 'Leg Press', sets: 4, reps: 12, weight: 120, rest: 120 },
+                        { name: 'Extensora', sets: 3, reps: 15, weight: 40, rest: 60 },
+                        { name: 'Flexora', sets: 3, reps: 12, weight: 35, rest: 60 },
+                        { name: 'Panturrilha', sets: 4, reps: 20, weight: 60, rest: 45 },
+                        { name: 'Afundo', sets: 3, reps: 12, weight: 20, rest: 90 }
+                    ]
+                }
+            ];
+            
+            // Create a simple selection modal (can be enhanced)
+            const templateNames = templates.map(t => t.name);
+            const selection = prompt('Escolha um template:\n\n' + templateNames.map((name, i) => `${i + 1}. ${name}`).join('\n'));
+            
+            if (selection && selection >= 1 && selection <= templates.length) {
+                const selectedTemplate = templates[selection - 1];
+                currentWorkout.exercises = selectedTemplate.exercises.map(ex => ({...ex}));
+                currentWorkout.type = selectedTemplate.name;
+                currentWorkout.isTemplate = true;
+                
+                renderExerciseList();
+                showSuccess(`Template "${selectedTemplate.name}" carregado com sucesso! 💪`);
+            }
         }
 
         function clearWorkout() {
